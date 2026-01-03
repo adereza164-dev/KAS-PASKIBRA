@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kas Paskibra V4.3 — Admin Login</title>
+
+  <style>
+    /* =========================
+   RESPONSIVE MOBILE
+   ========================= */
+@media (max-width: 768px) {
+
+  body {
+    padding: 10px;
+  }
+
+  .wrap {
+    padding: 0;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav .btn {
+    flex: 1 1 45%;
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  /* Grid jadi satu kolom */
+  .cols-3,
+  .cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .row select,
+  .row button {
+    width: 100%;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 14px;
+  }
+
+  /* TABEL RESPONSIVE */
+  table {
+    font-size: 13px;
+  }
+
+  table th,
+  table td {
+    padding: 8px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Login card */
+  .login-card {
+    max-width: 100%;
+  }
+
+}
+
+    :root{
+      --bg:#f4f7fb; --card:#fff; --muted:#6b7280;
+      --accent1:#06b6d4; --accent2:#10b981; --shadow:0 8px 24px rgba(13,35,61,0.08);
+      --radius:12px; --border:#e6edf3; --suggest-hover:#e6ffef;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:var(--bg);color:#0f172a;padding:18px}
+    .wrap{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .brand{display:flex;flex-direction:column}
+    h1{margin:0;font-size:20px}
+    .subtitle{color:var(--muted);font-size:13px}
+    .nav{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+    .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;border:none;padding:8px 12px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow);font-weight:600}
+    .btn.ghost{background:#fff;color:#0f172a;border:1px solid var(--border);box-shadow:none}
+    .card{background:var(--card);padding:14px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px}
+    .grid{display:grid;gap:10px}
+    .cols-3{grid-template-columns:1fr 1fr 1fr}
+    .cols-2{grid-template-columns:1fr 1fr}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input[type=text],input[type=number],input[type=password],select,button{font-size:14px}
+    input[type=text],input[type=number],input[type=password],select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border)}
+    .row{display:flex;gap:8px;align-items:center}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:10px;border-bottom:1px solid #f1f5f9;text-align:center;vertical-align:middle}
+    th{background:#fbfeff;color:#062b2b;font-weight:700}
+    .muted{color:var(--muted)}
+    .small{font-size:13px}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f0f9f7;color:#075985;font-weight:600}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    
+    /* CSS Login & Utility */
+    .hidden { display: none !important; }
+    #viewLogin { display: flex; justify-content: center; align-items: center; min-height: 300px; margin-top: 50px; }
+    .login-card { width: 100%; max-width: 360px; text-align: center; }
+
+    .suggest-wrap{position:relative}
+    .suggest-box{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 20px rgba(2,6,23,0.08);max-height:220px;overflow:auto;z-index:60;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity 0.2s ease, transform 0.2s ease;}
+    .suggest-box.show{opacity:1;transform:translateY(0);pointer-events:auto}
+    .suggest-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid #f3f6f8;text-align:left}
+    .suggest-item:hover{background:var(--suggest-hover)}
+    .suggest-match{color:var(--accent1);font-weight:700}
+    .section-title { text-align:center;color:#0984e3;font-weight:700;margin:0 0 8px 0;font-size:16px; }
+
+    /* PDF preview style */
+    .pdf-capture { background: #fff; color: #000; padding: 16px; border-radius: 6px; }
+    .pdf-header { text-align: center; margin-bottom: 8px; font-weight:700; }
+    .pdf-table { width: 100%; border-collapse: collapse; }
+    .pdf-table th, .pdf-table td { border: 1px solid #ddd; padding:8px; font-size:12px; text-align:center; }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+/* ===== FIREBASE CONFIG (ISI PUNYA KAMU) ===== */
+const firebaseConfig = {
+  apiKey: "API_KEY_KAMU",
+  authDomain: "project-id.firebaseapp.com",
+  projectId: "project-id"
+};
+/* ========================================== */
+
+const app = initializeApp(firebaseConfig);
+
+/* simpan ke window supaya bisa dipakai script lama */
+window.db = getFirestore(app);
+window.auth = getAuth(app);
+</script>
+
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>Kas Paskibra — Admin</h1>
+        <div class="subtitle">Sistem Pengelolaan Kas Digital</div>
+      </div>
+
+      <nav class="nav hidden" id="mainNav">
+        <button class="btn" id="navHome">🏠 Beranda</button>
+        <button class="btn ghost" id="navRekapBulanan">📆 Rekap Bulanan</button>
+        <button class="btn ghost" id="navRekapMingguan">🗓️ Rekap Mingguan</button>
+        <button class="btn ghost" id="navMembers">👥 Kelola Anggota</button>
+        <button class="btn ghost" id="btnLogout" style="color:#ef4444; border-color:#fecaca">Logout</button>
+      </nav>
+    </header>
+
+    <main id="viewLogin">
+      <div class="card login-card">
+        <h2 class="section-title">Login Admin</h2>
+        <p class="muted small">Masukkan password untuk akses data kas</p>
+        <div style="height:15px"></div>
+        <input type="password" id="adminPassword" placeholder="Password" style="text-align:center" />
+        <div style="height:12px"></div>
+        <button class="btn" id="btnLogin" style="width:100%">Masuk</button>
+      </div>
+    </main>
+
+    <div id="appContent" class="hidden">
+        <main id="viewHome" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+            <div><div class="small muted">Form Transaksi</div><div style="font-weight:700">Tambah transaksi baru</div></div>
+            <div class="muted small">Target: Rp5.000/minggu · Rp20.000/bulan</div>
+          </div>
+    
+          <div style="height:10px"></div>
+          <div class="grid cols-3">
+            <div>
+              <label>Nama Anggota</label>
+              <div class="suggest-wrap">
+                <input id="inputMember" type="text" placeholder="Ketik nama anggota" autocomplete="off" />
+                <div id="suggestions" class="suggest-box" aria-hidden="true"></div>
+              </div>
+            </div>
+            <div>
+              <label>Nominal (Rp)</label>
+              <input id="inputAmount" type="number" placeholder="5000" />
+            </div>
+            <div>
+              <label>Keterangan</label>
+              <select id="inputDesc">
+                <option value="">Pilih keterangan</option>
+                <optgroup label="Mingguan">
+                  <option value="Minggu 1">Minggu 1</option>
+                  <option value="Minggu 2">Minggu 2</option>
+                  <option value="Minggu 3">Minggu 3</option>
+                  <option value="Minggu 4">Minggu 4</option>
+                </optgroup>
+                <optgroup label="Bulanan">
+                  <option value="Januari">Januari</option>
+                  <option value="Februari">Februari</option>
+                  <option value="Maret">Maret</option>
+                  <option value="April">April</option>
+                  <option value="Mei">Mei</option>
+                  <option value="Juni">Juni</option>
+                  <option value="Juli">Juli</option>
+                  <option value="Agustus">Agustus</option>
+                  <option value="September">September</option>
+                  <option value="Oktober">Oktober</option>
+                  <option value="November">November</option>
+                  <option value="Desember">Desember</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+    
+          <div style="height:10px"></div>
+          <div class="row">
+            <select id="inputType" style="width:160px">
+              <option value="masuk">Uang Masuk</option>
+              <option value="keluar">Uang Keluar</option>
+            </select>
+            <button class="btn" id="btnAdd">Tambah</button>
+            <button class="btn ghost" id="btnClear">Bersihkan</button>
+          </div>
+    
+          <div style="height:12px"></div>
+          <div class="card">
+            <div class="grid cols-3">
+              <div><div class="muted small">Total Pemasukan</div><div id="totalIn" style="font-weight:bold">Rp 0</div></div>
+              <div><div class="muted small">Total Pengeluaran</div><div id="totalOut" style="font-weight:bold">Rp 0</div></div>
+              <div><div class="muted small">Saldo</div><div id="balance" style="font-weight:bold; color:var(--accent2)">Rp 0</div></div>
+            </div>
+          </div>
+    
+          <div class="card">
+            <h2 class="section-title">Riwayat Transaksi</h2>
+            <div style="overflow:auto;max-height:320px">
+              <table id="tableTransaksi"><thead><tr><th>Nama</th><th>Nominal</th><th>Jenis</th><th>Keterangan</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </main>
+    
+        <main id="viewRekapBulanan" class="card" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="small muted">Rekap Bulanan</div><div style="font-weight:700">Status pembayaran per anggota</div></div>
+            <div class="row">
+              <select id="rekapMonth"></select>
+              <button class="btn" id="btnDownloadRekapB">Download PDF</button>
+            </div>
+          </div>
+          <div style="height:12px"></div>
+          <div style="overflow:auto">
+            <table id="tableRekapB"><thead><tr><th>Nama Anggota</th><th>Nominal Pembayaran</th><th>Status</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div style="margin-top:12px;font-weight:700">Total kas bulan: <span id="totalMonth">Rp 0</span></div>
+        </main>
+    
+        <main id="viewRekapMingguan" class="card" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+            <div><div class="small muted">Rekap Mingguan</div><div style="font-weight:700">Status per minggu</div></div>
+            <div class="row">
+              <select id="rekapMonthW"></select>
+              <select id="rekapWeek" style="width:120px">
+                <option value="Minggu 1">Minggu 1</option>
+                <option value="Minggu 2">Minggu 2</option>
+                <option value="Minggu 3">Minggu 3</option>
+                <option value="Minggu 4">Minggu 4</option>
+              </select>
+              <button class="btn" id="btnDownloadRekapW">Download PDF</button>
+            </div>
+          </div>
+          <div style="height:12px"></div>
+          <div style="overflow:auto">
+            <table id="tableRekapW"><thead><tr><th>Nama Anggota</th><th>Nominal</th><th>Status</th></tr></thead><tbody></tbody></table>
+          </div>
+          <div style="margin-top:12px;font-weight:700">Total kas minggu: <span id="totalWeek">Rp 0</span></div>
+        </main>
+    
+        <main id="viewMembers" class="card" style="display:none">
+          <h2 class="section-title">Kelola Anggota</h2>
+          <div class="grid cols-2">
+            <div>
+              <label>Tambah Anggota Baru</label>
+              <input id="newMemberName" type="text" placeholder="Nama lengkap" />
+              <button class="btn" id="btnAddMember" style="margin-top:8px; width:100%">Simpan Anggota</button>
+            </div>
+            <div>
+              <label>Daftar Anggota</label>
+              <div style="max-height:300px;overflow:auto;border:1px solid var(--border);border-radius:10px">
+                <table id="tableMembers" style="width:100%"><thead><tr><th>Nama</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+              </div>
+            </div>
+          </div>
+        </main>
+    </div>
+
+    <footer>Data tersimpan lokal di browser ini.</footer>
+  </div>
+
+<script>
+(async function(){
+  const { jsPDF } = window.jspdf;
+
+  // --- KONFIGURASI LOGIN & STORAGE ---
+  const ADMIN_PASSWORD = "12345"; // GANTI PASSWORD DI SINI
+  const SESSION_KEY = 'kp_admin_session';
+  const KEY_MEMBERS = 'kp_members_v3';
+  const KEY_ENTRIES = 'kp_entries_v3';
+  const TARGET_WEEKLY = 5000;
+  const TARGET_MONTHLY = 20000;
+
+  // DOM Refs (Login)
+  const viewLogin = document.getElementById('viewLogin');
+  const appContent = document.getElementById('appContent');
+  const mainNav = document.getElementById('mainNav');
+  const adminPasswordInput = document.getElementById('adminPassword');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnLogout = document.getElementById('btnLogout');
+
+  // DOM Refs (Main App)
+  const navHome = document.getElementById('navHome');
+  const navRekapB = document.getElementById('navRekapBulanan');
+  const navRekapW = document.getElementById('navRekapMingguan');
+  const navMembers = document.getElementById('navMembers');
+  const viewHome = document.getElementById('viewHome');
+  const viewRekapB = document.getElementById('viewRekapBulanan');
+  const viewRekapW = document.getElementById('viewRekapMingguan');
+  const viewMembers = document.getElementById('viewMembers');
+
+  // Input & Dashboard Refs
+  const inputMember = document.getElementById('inputMember');
+  const inputAmount = document.getElementById('inputAmount');
+  const inputDesc = document.getElementById('inputDesc');
+  const inputType = document.getElementById('inputType');
+  const btnAdd = document.getElementById('btnAdd');
+  const totalInEl = document.getElementById('totalIn');
+  const totalOutEl = document.getElementById('totalOut');
+  const balanceEl = document.getElementById('balance');
+  const tableTransaksiBody = document.querySelector('#tableTransaksi tbody');
+  const suggestionsBox = document.getElementById('suggestions');
+
+  // Rekap & Member Refs
+  const rekapMonth = document.getElementById('rekapMonth');
+  const tableRekapBBody = document.querySelector('#tableRekapB tbody');
+  const totalMonthEl = document.getElementById('totalMonth');
+  const rekapMonthW = document.getElementById('rekapMonthW');
+  const rekapWeek = document.getElementById('rekapWeek');
+  const tableRekapWBody = document.querySelector('#tableRekapW tbody');
+  const totalWeekEl = document.getElementById('totalWeek');
+  const tableMembersBody = document.querySelector('#tableMembers tbody');
+
+  // State
+  let members = JSON.parse(localStorage.getItem(KEY_MEMBERS) || '[]');
+  let entries = JSON.parse(localStorage.getItem(KEY_ENTRIES) || '[]');
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+  // --- LOGIKA LOGIN ---
+  function checkLoginStatus() {
+    const isLoggedIn = sessionStorage.getItem(SESSION_KEY);
+    if (isLoggedIn === 'true') {
+      viewLogin.classList.add('hidden');
+      appContent.classList.remove('hidden');
+      mainNav.classList.remove('hidden');
+      refreshDashboard();
+    } else {
+      viewLogin.classList.remove('hidden');
+      appContent.classList.add('hidden');
+      mainNav.classList.add('hidden');
+    }
+  }
+
+  btnLogin.addEventListener('click', () => {
+    if (adminPasswordInput.value === ADMIN_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      adminPasswordInput.value = '';
+      checkLoginStatus();
+    } else {
+      alert('Password salah!');
+    }
+  });
+
+  adminPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') btnLogin.click(); });
+
+  btnLogout.addEventListener('click', () => {
+    if (confirm('Keluar dari mode admin?')) {
+      sessionStorage.removeItem(SESSION_KEY);
+      location.reload();
+    }
+  });
+
+  // --- LOGIKA CORE APLIKASI ---
+  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+  function fmtRp(n){ return 'Rp ' + Number(n||0).toLocaleString(); }
+  function todayStr(){ const d=new Date(); return d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear(); }
+
+  function fillSelectMonths(){
+    [rekapMonth, rekapMonthW].forEach(sel => {
+        sel.innerHTML = '';
+        months.forEach((m,i) => { const o = document.createElement('option'); o.value=i; o.textContent=m; sel.appendChild(o); });
+        sel.value = new Date().getMonth();
+    });
+  }
+
+  function refreshDashboard(){
+    const tIn = entries.filter(e=>e.type==='masuk').reduce((s,e)=>s+Number(e.amount),0);
+    const tOut = entries.filter(e=>e.type==='keluar').reduce((s,e)=>s+Number(e.amount),0);
+    totalInEl.textContent = fmtRp(tIn);
+    totalOutEl.textContent = fmtRp(tOut);
+    balanceEl.textContent = fmtRp(tIn - tOut);
+
+    tableTransaksiBody.innerHTML='';
+    entries.slice().reverse().slice(0, 50).forEach(e=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${e.member}</td><td>${fmtRp(e.amount)}</td><td>${e.type}</td><td>${e.desc||'-'}</td><td>${e.date}</td>
+        <td><button class="btn ghost" style="padding:4px 8px" onclick="window.deleteEntry('${e.id}')">Hapus</button></td>`;
+      tableTransaksiBody.appendChild(tr);
+    });
+  }
+
+  window.deleteEntry = (id) => {
+    if(confirm('Hapus transaksi ini?')){
+        entries = entries.filter(e => e.id !== id);
+        save(KEY_ENTRIES, entries);
+        refreshDashboard();
+    }
+  };
+
+  // Sugesti Nama
+  inputMember.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    suggestionsBox.innerHTML = '';
+    if(!q) { suggestionsBox.classList.remove('show'); return; }
+    const matches = members.filter(m => m.toLowerCase().includes(q));
+    matches.forEach(m => {
+        const div = document.createElement('div'); div.className='suggest-item'; div.textContent = m;
+        div.onclick = () => { inputMember.value = m; suggestionsBox.classList.remove('show'); };
+        suggestionsBox.appendChild(div);
+    });
+    suggestionsBox.classList.add(matches.length ? 'show' : 'hide');
+  });
+
+  // Tambah Transaksi
+  btnAdd.addEventListener('click', () => {
+    const member = inputMember.value.trim();
+    const amount = Number(inputAmount.value);
+    const desc = inputDesc.value;
+    const type = inputType.value;
+
+    if(!member || !amount) return alert('Lengkapi data!');
+    
+    if(!members.includes(member)) {
+        if(confirm(`Anggota "${member}" belum terdaftar. Tambahkan?`)) {
+            members.push(member); save(KEY_MEMBERS, members);
+        } else return;
+    }
+
+    entries.push({ id: Date.now().toString(), member, amount, desc, type, date: todayStr() });
+    save(KEY_ENTRIES, entries);
+    inputAmount.value = ''; inputMember.value = '';
+    refreshDashboard();
+    alert('Berhasil disimpan!');
+  });
+
+  // Rekap Bulanan
+  function renderRekapB() {
+    const mIdx = Number(rekapMonth.value);
+    tableRekapBBody.innerHTML = '';
+    let total = 0;
+    members.forEach(m => {
+        const paid = entries.filter(e => e.member === m && e.type === 'masuk' && Number(e.date.split('/')[1]) === (mIdx + 1)).reduce((s,e)=>s+e.amount, 0);
+        total += paid;
+        const status = paid >= TARGET_MONTHLY ? 'LUNAS' : `Kurang ${fmtRp(TARGET_MONTHLY - paid)}`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${m}</td><td>${fmtRp(paid)}</td><td style="color:${paid >= TARGET_MONTHLY ? 'green':'red'}">${status}</td>`;
+        tableRekapBBody.appendChild(tr);
+    });
+    totalMonthEl.textContent = fmtRp(total);
+  }
+
+  // Rekap Mingguan
+  function renderRekapW() {
+  const mIdx = Number(rekapMonthW.value);
+  const wStr = rekapWeek.value;
+  tableRekapWBody.innerHTML = '';
+  let total = 0;
+
+  members.forEach(m => {
+
+    // total bayar minggu 1
+    const paidWeek1 = entries
+      .filter(e =>
+        e.member === m &&
+        e.type === 'masuk' &&
+        e.desc === 'Minggu 1' &&
+        Number(e.date.split('/')[1]) === (mIdx + 1)
+      )
+      .reduce((s, e) => s + e.amount, 0);
+
+    // total bayar minggu yang dipilih
+    const paidCurrentWeek = entries
+      .filter(e =>
+        e.member === m &&
+        e.type === 'masuk' &&
+        e.desc === wStr &&
+        Number(e.date.split('/')[1]) === (mIdx + 1)
+      )
+      .reduce((s, e) => s + e.amount, 0);
+
+    let status = 'BELUM BAYAR';
+    let paidDisplay = paidCurrentWeek;
+
+    // 🔥 LOGIKA BARU
+    if (paidWeek1 >= TARGET_MONTHLY) {
+      status = 'LUNAS';
+      paidDisplay = TARGET_WEEKLY;
+    } else if (paidCurrentWeek >= TARGET_WEEKLY) {
+      status = 'LUNAS';
+    }
+
+    total += paidDisplay;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${m}</td>
+      <td>${fmtRp(paidDisplay)}</td>
+      <td style="color:${status === 'LUNAS' ? 'green' : 'red'}">${status}</td>
+    `;
+    tableRekapWBody.appendChild(tr);
+  });
+
+  totalWeekEl.textContent = fmtRp(total);
+}
+
+  // Kelola Anggota
+  function renderMembers() {
+    tableMembersBody.innerHTML = '';
+    members.forEach((m, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${m}</td><td><button class="btn ghost" onclick="window.delMember(${i})">Hapus</button></td>`;
+        tableMembersBody.appendChild(tr);
+    });
+  }
+
+  window.delMember = (i) => {
+    if(confirm('Hapus anggota? Data transaksi tidak ikut terhapus.')){
+        members.splice(i, 1); save(KEY_MEMBERS, members); renderMembers();
+    }
+  };
+
+  document.getElementById('btnAddMember').onclick = () => {
+    const n = document.getElementById('newMemberName').value.trim();
+    if(n && !members.includes(n)) {
+        members.push(n); save(KEY_MEMBERS, members); renderMembers();
+        document.getElementById('newMemberName').value = '';
+    }
+  };
+
+  // Navigasi
+  const hideAll = () => [viewHome, viewRekapB, viewRekapW, viewMembers].forEach(v => v.style.display = 'none');
+  navHome.onclick = () => { hideAll(); viewHome.style.display='block'; refreshDashboard(); };
+  navRekapB.onclick = () => { hideAll(); viewRekapB.style.display='block'; renderRekapB(); };
+  navRekapW.onclick = () => { hideAll(); viewRekapW.style.display='block'; renderRekapW(); };
+  navMembers.onclick = () => { hideAll(); viewMembers.style.display='block'; renderMembers(); };
+
+  rekapMonth.onchange = renderRekapB;
+  rekapMonthW.onchange = renderRekapW;
+  rekapWeek.onchange = renderRekapW;
+
+  // PDF Export
+  async function downloadPDF(tableId, title, fileName) {
+  const el = document.getElementById(tableId);
+  const canvas = await html2canvas(el, { scale: 2 });
+  const imgData = canvas.toDataURL('image/png');
+
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  // ===== BACKGROUND HEADER =====
+  pdf.setFillColor(6, 182, 212); // biru
+  pdf.rect(0, 0, pageWidth, 30, 'F');
+
+  // ===== JUDUL HEADER =====
+  pdf.setTextColor(255);
+  pdf.setFontSize(16);
+  pdf.text('KAS PASKIBRA', pageWidth / 2, 15, { align: 'center' });
+
+  pdf.setFontSize(11);
+  pdf.text(title, pageWidth / 2, 23, { align: 'center' });
+
+  // ===== WATERMARK (BELAKANG) =====
+  pdf.setTextColor(230);
+  pdf.setFontSize(50);
+  pdf.text(
+    'KAS PASKIBRA',
+    pageWidth / 2,
+    pageHeight / 2,
+    { angle: 45, align: 'center' }
+  );
+
+  // ===== ISI TABEL =====
+  pdf.addImage(imgData, 'PNG', 10, 40, pageWidth - 20, 0);
+
+  // ===== FOOTER =====
+  pdf.setTextColor(120);
+  pdf.setFontSize(9);
+  pdf.line(10, pageHeight - 15, pageWidth - 10, pageHeight - 15);
+  pdf.text(
+    `Dicetak pada: ${new Date().toLocaleString()}`,
+    pageWidth / 2,
+    pageHeight - 8,
+    { align: 'center' }
+  );
+
+  pdf.save(fileName);
+}
+
+  document.getElementById('btnDownloadRekapB').onclick = () => downloadPDF('tableRekapB', `Rekap Bulanan - ${months[rekapMonth.value]}`, 'Rekap_Bulan.pdf');
+  document.getElementById('btnDownloadRekapW').onclick = () => downloadPDF('tableRekapW', `Rekap Mingguan - ${rekapWeek.value}`, 'Rekap_Minggu.pdf');
+
+  // Init
+  fillSelectMonths();
+  checkLoginStatus();
+
+})();
+</script>
+</body>
+</html>
